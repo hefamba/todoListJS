@@ -1,58 +1,67 @@
-const form = document.getElementById('form')
-const input = document.getElementById('input')
-const todosUl = document.getElementById('todos')
+/** @format */
+const form = document.getElementById('form');
+const todoUL = document.getElementById('todos');
+const input = document.getElementById('input');
 
-const todos = JSON.parse(localStorage.getItem('todos'))
-
-if (todos){
-    todos.forEach(todo => addToDo(todo))
+const todos = JSON.parse(localStorage.getItem('todos'));
+if (todos) {
+  todos.forEach((todo) => {
+    addToDO(todo);
+  });
 }
 
-form.addEventListener('submit', (event)=>{
-    event.preventDefault()
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  addToDO();
+});
 
-    addToDo()
-})
+function addToDO(todo) {
+  let todoText = input.value;
 
-function addToDo(todo){
-    let todoText = input.value
+  // checking to see if a todo is already passed in.
+  if (todo) {
+    todoText = todo.text;
+  }
 
-    if (todo){
-        todoText = todo.text
+  //constructing a list item
+  if (todoText) {
+    const todoEl = document.createElement('li');
+    // now check to see if the todo is marked as completed
+    if (todo && todo.completed) {
+      todoEl.classList.add('completed');
     }
+    // adding the completed class element
+    todoEl.addEventListener('click', () => {
+      todoEl.classList.toggle('completed');
+      updateLS();
+    });
 
-    if(todoText){
-        const todoEl = document.createElement('li')
-        if(todo && todo.completed){
-            todoEl.classList.add('completed')
-        }
-       todoEl.innerText = todoText
-       todosUl.appendChild(todoEl)
+    // removing the todoEl
+    todoEl.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      todoEl.remove();
+      updateLS();
+    });
 
-       todoEl.addEventListener('click' , ()=>{
-        todoEl.classList.toggle('completed')
-        updateLS()
-       })
-
-       todoEl.addEventListener('contextmenu', (event) =>{
-        event.preventDefault()
-        todoEl.remove()
-        updateLS()
-       })
-    }
-    input.value = ''
-    updateLS()
+    // adding to the DOM
+    todoEl.innerText = todoText;
+    todoUL.appendChild(todoEl);
+    // reseting the value of the input
+    input.value = '';
+  }
+  updateLS();
 }
 
-function updateLS(){
-    const todosEl = document.querySelectorAll('li')
+function updateLS() {
+  const todosEl = document.querySelectorAll('li');
 
-    const todosArr = []
+  let todos = [];
 
-    todosEl.forEach(todo => todosArr.push({
-        text: todo.innerText,
-        completed: todo.classList.contains('completed') 
-    }))
-
-    localStorage.setItem('todos', JSON.stringify(todosArr))
+  todosEl.forEach((todo) =>
+    todos.push({
+      text: todo.innerText,
+      completed: todo.classList.contains('completed'),
+    })
+  );
+  localStorage.setItem('todos', JSON.stringify(todos));
 }
